@@ -502,14 +502,56 @@ async function sendMessage() {
   const typing = showTyping();
 
   try {
+    // Build a concise DB summary to avoid oversized payloads
+    const dbSummary = {
+      candidates: db.candidates.map(r=>({name:r.name,salary:r.salary,skills:r.skills})).slice(-10),
+      roles: db.roles.map(r=>({title:r.title,salary_range:r.salary_range})).slice(-10),
+      tasks: db.tasks.map(r=>({title:r.title,status:r.status})).slice(-10),
+      invites: db.invites.length,
+      events: db.events.map(r=>({title:r.title,date:r.date})).slice(-5),
+      notes: db.notes.length
+    };
+
+    const payload = {
+      model: 'claude-sonnet-4-5',
+      max_tokens: 1000,
+      system: SYS + '\n\nDB ACTUAL:\n' + JSON.stringify(dbSummary),
+      messages: history
+    };
+
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000,
-        system: SYS + '\n\nDB ACTUAL:\n' + JSON.stringify(db),
-        messages: history })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(payload)
     });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      typing.remove();
+      appendMsg('assistant', 'Error HTTP ' + res.status + ': ' + errText.substring(0, 200));
+      loading=false; document.getElementById('send-btn').disabled=false;
+      return;
+    }
+
     const data = await res.json();
+    if (data.error) {
+      typing.remove();
+      appendMsg('assistant', 'Error API: ' + data.error.message);
+      loading=false; document.getElementById('send-btn').disabled=false;
+      return;
+    }
+
     const full = (data.content||[]).map(b=>b.text||'').join('');
+    if (!full) {
+      typing.remove();
+      appendMsg('assistant', 'Respuesta vacía del servidor. Inténtalo de nuevo.');
+      loading=false; document.getElementById('send-btn').disabled=false;
+      return;
+    }
     history.push({role:'assistant', content:full});
     typing.remove();
 
@@ -525,7 +567,7 @@ async function sendMessage() {
         } catch { appendMsg('assistant', txt2.trim()); }
       } else appendMsg('assistant', txt2.trim());
     } else appendMsg('assistant', full);
-  } catch(err) { typing.remove(); appendMsg('assistant', 'Error de conexión. Inténtalo de nuevo.'); }
+  } catch(err) { typing.remove(); appendMsg('assistant', 'Error: ' + (err.message||'Inténtalo de nuevo.')); }
   loading=false; document.getElementById('send-btn').disabled=false;
 }
 
@@ -536,8 +578,7 @@ function appendMsg(role, text, records=[]) {
   if (role==='user') av.textContent='TÚ';
   else av.innerHTML=`<img src="data:image/png;base64,${ICON_B64}" alt="PP">`;
   const bub = document.createElement('div'); bub.className='bubble';
-  bub.innerHTML = text.replace(/
-/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  bub.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
 
   const labels = {candidate:'Candidato',role:'Rol',interaction:'Call',task:'Tarea',event:'Evento',invite:'Invitación',note:'Nota'};
   records.forEach(r => {

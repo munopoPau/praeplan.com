@@ -100,6 +100,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 /* CARDS */
 .card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm)}
 .card:hover{border-color:var(--accent);border-left-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-1px)}
+.card-del{display:none;background:none;border:none;color:var(--muted2);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;border-radius:4px;flex-shrink:0}
+.card-del:hover{color:#e53e3e;background:#fff0f0}
+.card:hover .card-del{display:block}
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px;gap:7px}
 .card-name{font-family:'Syne',sans-serif;font-weight:600;font-size:12px;line-height:1.3}
 .badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
@@ -339,7 +342,7 @@ textarea::placeholder{color:var(--muted2)}
   <div class="sidebar">
     <div class="stabs">
       <button class="stab active" onclick="switchTab('candidates')">Candidatos</button>
-      <button class="stab" onclick="switchTab('roles')">Roles</button>
+      <button class="stab" onclick="switchTab('profiles')">Perfiles</button>
       <button class="stab" onclick="switchTab('tasks')">Tareas</button>
       <button class="stab" onclick="switchTab('events')">Eventos</button>
       <button class="stab" onclick="switchTab('invites')">Invitaciones</button>
@@ -354,8 +357,8 @@ textarea::placeholder{color:var(--muted2)}
       </div>
 
       <!-- ROLES -->
-      <div id="tab-roles" class="tpanel">
-        <div id="list-roles"><div class="empty"><div class="empty-ico">—</div>Sin roles.<br>Usa /R para añadir uno.</div></div>
+      <div id="tab-profiles" class="tpanel">
+        <div id="list-profiles"><div class="empty"><div class="empty-ico">—</div>Sin perfiles.<br>Usa /P para añadir uno.</div></div>
       </div>
 
       <!-- TASKS -->
@@ -363,7 +366,6 @@ textarea::placeholder{color:var(--muted2)}
         <div class="tfilters">
           <button class="tfbtn on" onclick="filterTasks(this,'all')">Todas</button>
           <button class="tfbtn" onclick="filterTasks(this,'todo')">Pendiente</button>
-          <button class="tfbtn" onclick="filterTasks(this,'doing')">En proceso</button>
           <button class="tfbtn" onclick="filterTasks(this,'done')">Hecho</button>
         </div>
         <div id="list-tasks"><div class="empty"><div class="empty-ico">—</div>Sin tareas.<br>Usa /T para añadir una.</div></div>
@@ -399,7 +401,7 @@ textarea::placeholder{color:var(--muted2)}
       <div class="msg assistant">
         <div class="av a"><img src="data:image/png;base64,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" alt="PP"></div>
         <div class="bubble">
-          Bienvenido a <strong>Prae Plan CRM</strong>. Escribe en lenguaje natural o usa comandos rápidos:<br><br>
+          Bienvenido a <strong>Prae Plan CRM</strong>. Escribe en lenguaje natural o usa comandos rápidos:<br><br>💡 <em>Pega el texto de un perfil de LinkedIn y lo registraré como candidato automáticamente.</em><br><br>
           <strong>/C</strong> Candidato &nbsp;·&nbsp; <strong>/R</strong> Rol &nbsp;·&nbsp; <strong>/T</strong> Tarea<br>
           <strong>/E</strong> Evento &nbsp;·&nbsp; <strong>/I</strong> Invitación LinkedIn &nbsp;·&nbsp; <strong>/N</strong> Nota
         </div>
@@ -417,7 +419,7 @@ textarea::placeholder{color:var(--muted2)}
     <!-- CMD HINTS -->
     <div class="cmds">
       <span class="cmd" onclick="insertCmd('/C ')">/C candidato</span>
-      <span class="cmd" onclick="insertCmd('/R ')">/R rol</span>
+      <span class="cmd" onclick="insertCmd('/P ')">/P perfil</span>
       <span class="cmd" onclick="insertCmd('/T ')">/T tarea</span>
       <span class="cmd" onclick="insertCmd('/E ')">/E evento</span>
       <span class="cmd" onclick="insertCmd('/I ')">/I invitación</span>
@@ -450,7 +452,7 @@ let CONFIG = {
   sb_token: ''
 };
 
-const db = { candidates:[], roles:[], tasks:[], events:[], invites:[], notes:[], interactions:[] };
+const db = { candidates:[], profiles:[], tasks:[], events:[], invites:[], notes:[], interactions:[] };
 let history = [];
 let loading = false;
 let activeTab = 'candidates';
@@ -462,7 +464,7 @@ const SYS = `Eres el asistente CRM de Prae Plan para un recruitment consultant.
 Responde en español, breve (máx 2-3 líneas).
 
 Comandos disponibles:
-/C → candidato · /R → rol · /T → tarea · /E → evento · /I → invitación LinkedIn · /N → nota
+/C → candidato · /P → perfil · /T → tarea · /E → evento · /I → invitación LinkedIn · /N → nota
 
 Cuando detectes datos nuevos escribe al final: <<<JSON_START>>>
 y el JSON (solo los tipos detectados):
@@ -470,7 +472,7 @@ y el JSON (solo los tipos detectados):
   "records": [
     {"type":"candidate","name":"","salary":"","skills":[],"attitude":"","phone":"","email":"","notes":""},
     {"type":"interaction","person":"","channel":"llamada/email/LinkedIn","summary":"","sentiment":"positivo/negativo/neutro","next_action":""},
-    {"type":"role","title":"","skills_needed":[],"salary_range":"","client":"","notes":""},
+    {"type":"profile","title":"","skills_needed":[],"salary_range":"","client":"","notes":""},
     {"type":"task","title":"","status":"todo","related_to":"","notes":""},
     {"type":"event","title":"","date":"YYYY-MM-DD","time":"HH:MM","duration_minutes":60,"related_to":"","description":""},
     {"type":"invite","person":"","platform":"LinkedIn","message":"","related_to":""},
@@ -479,12 +481,17 @@ y el JSON (solo los tipos detectados):
 }
 Para /T: status = "todo" | "doing" | "done".
 Hoy: ${new Date().toISOString().split('T')[0]}. Convierte fechas relativas a YYYY-MM-DD.
-Si es solo una pregunta, responde solo texto sin JSON.`;
+Si el usuario pega texto de un perfil de LinkedIn (con experiencia, cargo, skills, empresa...), extrae todos los datos disponibles y crea un registro de tipo "candidate" con name, salary (si aparece), skills, attitude y notes con el resumen del perfil.
+Si el mensaje contiene una URL de LinkedIn (linkedin.com/in/nombreapellido), extrae el nombre de la URL (el segmento después de /in/) y crea DOS registros:
+1. tipo "invite" con person=nombre extraído, platform="LinkedIn", related_to=URL
+2. tipo "candidate" con name=nombre extraído, notes="Perfil LinkedIn: "+URL
+Responde confirmando que has registrado la invitación y añadido el candidato.
+Si es solo una pregunta, responde solo texto sin JSON.\`;
 
 // ── SLASH COMMANDS ──────────────────────────────────────────────────────────
 const CMD_CTX = {
   '/C': 'Registra este candidato:',
-  '/R': 'Registra este rol:',
+  '/P': 'Registra este perfil:',
   '/T': 'Registra esta tarea (status: todo por defecto):',
   '/E': 'Registra este evento:',
   '/I': 'Registra esta invitación de LinkedIn. Incluye el campo "message" con el texto de la invitación:',
@@ -517,15 +524,16 @@ async function sbReq(table, method='GET', body=null, filter='') {
 }
 
 async function sbSave(type, rec) {
-  const map = { candidate:'pp_candidates', role:'pp_roles', interaction:'pp_interactions', note:'pp_notes', task:'pp_tasks', event:'pp_events', invite:'pp_invites' };
+  const map = { candidate:'pp_candidates', profile:'pp_profiles', interaction:'pp_interactions', note:'pp_notes', task:'pp_tasks', event:'pp_events', invite:'pp_invites' };
   if (map[type]) await sbReq(map[type], 'POST', {...rec, created_at: new Date().toISOString()});
 }
 
 async function sbLoad() {
-  if (!CONFIG.sb_url || !CONFIG.sb_key) return;
+  if (!CONFIG.sb_url || !CONFIG.sb_key) { console.log('sbLoad: no credentials'); return; }
+  console.log('sbLoad: loading from', CONFIG.sb_url);
   const tables = [
     {key:'candidates',tbl:'pp_candidates',type:'candidate'},
-    {key:'roles',tbl:'pp_roles',type:'role'},
+    {key:'profiles',tbl:'pp_profiles',type:'profile'},
     {key:'interactions',tbl:'pp_interactions',type:'interaction'},
     {key:'notes',tbl:'pp_notes',type:'note'},
     {key:'tasks',tbl:'pp_tasks',type:'task'},
@@ -614,7 +622,7 @@ async function sendMessage() {
     // Build a concise DB summary to avoid oversized payloads
     const dbSummary = {
       candidates: db.candidates.map(r=>({name:r.name,salary:r.salary,skills:r.skills})).slice(-10),
-      roles: db.roles.map(r=>({title:r.title,salary_range:r.salary_range})).slice(-10),
+      profiles: db.profiles.map(r=>({title:r.title,salary_range:r.salary_range})).slice(-10),
       tasks: db.tasks.map(r=>({title:r.title,status:r.status})).slice(-10),
       invites: db.invites.length,
       events: db.events.map(r=>({title:r.title,date:r.date})).slice(-5),
@@ -687,7 +695,7 @@ function appendMsg(role, text, records=[]) {
   const bub = document.createElement('div'); bub.className='bubble';
   bub.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
 
-  const labels = {candidate:'Candidato',role:'Rol',interaction:'Call',task:'Tarea',event:'Evento',invite:'Invitación',note:'Nota'};
+  const labels = {candidate:'Candidato',profile:'Perfil',interaction:'Call',task:'Tarea',event:'Evento',invite:'Invitación',note:'Nota'};
   records.forEach(r => {
     const bl = document.createElement('div'); bl.className='rblock';
     const lb = document.createElement('div'); lb.className=`rlabel rl-${r.type}`; lb.textContent=labels[r.type]||'Registro';
@@ -708,7 +716,7 @@ function previewFields(r) {
   switch(r.type) {
     case 'candidate': return [['Nombre',r.name],['Salario',r.salary],['Skills',r.skills],['Actitud',r.attitude]];
     case 'interaction': return [['Persona',r.person],['Canal',r.channel],['Resumen',r.summary]];
-    case 'role': return [['Rol',r.title],['Skills',r.skills_needed],['Salario',r.salary_range]];
+    case 'profile': return [['Rol',r.title],['Skills',r.skills_needed],['Salario',r.salary_range]];
     case 'task': return [['Tarea',r.title],['Estado',r.status],['Rel.',r.related_to]];
     case 'event': return [['Título',r.title],['Fecha',r.date],['Hora',r.time]];
     case 'invite': return [['Persona',r.person],['Plataforma',r.platform],['Mensaje',r.message]];
@@ -750,17 +758,36 @@ function renderCard(listId, r) {
   card.className='card ' + cardTypeClass;
   card.dataset.ts = rtype==='task' ? (r.status||'todo') : '';
 
-  const typeLabels = {candidate:'Candidato',role:'Rol',interaction:'Call',note:'Nota',task:'Tarea',event:'Evento',invite:'Invitación'};
-  let badgeCls = {candidate:'b-cand',role:'b-role',note:'b-note',event:'b-event',invite:'b-invite',interaction:'b-call',
+  const typeLabels = {candidate:'Candidato',profile:'Perfil',interaction:'Call',note:'Nota',task:'Tarea',event:'Evento',invite:'Invitación'};
+  let badgeCls = {candidate:'b-cand',profile:'b-role',note:'b-note',event:'b-event',invite:'b-invite',interaction:'b-call',
     task: {'todo':'b-todo','doing':'b-doing','done':'b-done'}[r.status||'todo']}[rtype] || 'b-note';
 
   const title = r.name||r.title||r.person||(r.content?r.content.substring(0,34)+'…':'Sin título');
+
+  // Delete button
+  const delBtn = document.createElement('button');
+  delBtn.className = 'card-del';
+  delBtn.innerHTML = '×';
+  delBtn.title = 'Eliminar';
+  delBtn.onclick = async (e) => {
+    e.stopPropagation();
+    if (!confirm('¿Eliminar este registro?')) return;
+    const tblMap = {candidate:'pp_candidates',profile:'pp_profiles',interaction:'pp_interactions',task:'pp_tasks',event:'pp_events',note:'pp_notes',invite:'pp_invites'};
+    const tbl = tblMap[rtype];
+    if (tbl && r.id) await sbReq(tbl, 'DELETE', null, `?id=eq.${r.id}`);
+    card.remove();
+    updateCounters();
+    // Remove from db array
+    const dbKey = {candidate:'candidates',profile:'profiles',interaction:'interactions',task:'tasks',event:'events',note:'notes',invite:'invites'}[rtype];
+    if (dbKey) db[dbKey] = db[dbKey].filter(x => x.id !== r.id);
+  };
+
   let det = '';
 
   if (rtype==='candidate') {
     det = `${r.salary?'<strong>'+r.salary+'</strong> · ':''}${r.attitude||''}`;
     if (r.skills?.length) det += '<br>'+(r.skills||[]).map(s=>`<span class="tag">${s}</span>`).join('');
-  } else if (rtype==='role') {
+  } else if (rtype==='profile') {
     det = r.salary_range?`<strong>${r.salary_range}</strong>`:'';
     if (r.skills_needed?.length) det += '<br>'+(r.skills_needed||[]).map(s=>`<span class="tag">${s}</span>`).join('');
   } else if (rtype==='interaction') {
@@ -828,7 +855,7 @@ function updateCounters() {
 // ── TABS / SEARCH ────────────────────────────────────────────────────────────
 function switchTab(tab) {
   activeTab=tab;
-  const tabs=['candidates','roles','tasks','events','invites','notes'];
+  const tabs=['candidates','profiles','tasks','events','invites','notes'];
   document.querySelectorAll('.stab').forEach((b,i)=>b.classList.toggle('active',tabs[i]===tab));
   document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
@@ -882,7 +909,7 @@ function saveGC() {
 function exportCSV() {
   const rows=[];
   db.candidates.forEach(r=>rows.push(['candidato',r.name||'',r.salary||'',(r.skills||[]).join('|'),r.attitude||'',r.notes||'',r.created_at]));
-  db.roles.forEach(r=>rows.push(['rol',r.title||'',r.salary_range||'',(r.skills_needed||[]).join('|'),r.client||'',r.notes||'',r.created_at]));
+  db.profiles.forEach(r=>rows.push(['rol',r.title||'',r.salary_range||'',(r.skills_needed||[]).join('|'),r.client||'',r.notes||'',r.created_at]));
   db.tasks.forEach(r=>rows.push(['tarea',r.title||'','','',r.status||'',r.related_to||'',r.created_at]));
   db.events.forEach(r=>rows.push(['evento',r.title||'',r.date||'',r.time||'',r.related_to||'',r.gcal_id?'gcal':'',r.created_at]));
   db.invites.forEach(r=>rows.push(['invitacion',r.person||'',r.platform||'LinkedIn','',r.message||'',r.related_to||'',r.created_at]));
@@ -911,8 +938,12 @@ window.addEventListener('load', () => {
     CONFIG.sb_token = savedToken;
     document.getElementById('login-screen').classList.add('hidden');
   }
-  if(CONFIG.sb_url&&CONFIG.sb_key){ document.getElementById('step-sb').classList.add('done');
-    if (savedToken) sbLoad();
+  if(CONFIG.sb_url&&CONFIG.sb_key){ 
+    document.getElementById('step-sb').classList.add('done');
+    if (savedToken) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => sbLoad(), 100);
+    }
   }
   if(CONFIG.gc_api&&CONFIG.gc_cid) loadGAPI();
   if(CONFIG.sb_url&&CONFIG.gc_cid) document.getElementById('setup-bar').classList.add('hidden');
@@ -947,6 +978,12 @@ async function doLogin() {
     CONFIG.sb_token = data.access_token;
     localStorage.setItem('pp_sb_token', data.access_token);
     document.getElementById('login-screen').classList.add('hidden');
+    // Clear existing cards first
+    ['candidates','profiles','tasks','events','invites','notes','interactions'].forEach(k => {
+      const el = document.getElementById('list-'+k);
+      if (el) el.innerHTML = '';
+      db[k] = [];
+    });
     sbLoad();
   } else {
     errEl.textContent = data.error_description || 'Email o contraseña incorrectos.';
